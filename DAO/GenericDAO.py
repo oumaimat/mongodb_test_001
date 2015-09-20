@@ -54,6 +54,43 @@ class ConnectionToDatabase :
         #function result
         return collection
 
+class ConnectionToLocationDatabase :
+
+    database = None
+    fs = None
+    collection = None
+
+    #penser � cr�er un pool de connections r�utilisables vers la base
+    #solution actuelle non envisageable en prod
+
+    def __init__(self):
+        self.connectToDatabase()
+
+
+    def connectToDatabase(self) :
+        # Connexion au serveur de Mongo DB
+        db_conn=None
+
+        # url = os.environ["OPENSHIFT_MONGODB_DB_URL"]
+
+        try:
+            db_conn=pymongo.MongoClient()
+            print("Connected successfully!!!")
+            print(db_conn)
+        except pymongo.errors.ConnectionFailure :
+            print("Could not connect to MongoDB: %s")
+
+
+        # Connexion a la base du projet
+        #db = db_conn["mongodbtest0"]
+        db = db_conn["GPSLocationDB"]
+
+
+        #Initialisation des variables globales
+        ConnectionToLocationDatabase.database = db
+        ConnectionToLocationDatabase.fs = GridFS(db)
+        ConnectionToLocationDatabase.collection = db.get_collection("steeds")
+
 class GenericDAO :
 
     connectionToDatabase = ConnectionToDatabase()
@@ -181,22 +218,26 @@ class GenericDAO :
 
 
 
+class GenericLocationDAO :
 
+    connectionToLocationDatabase = ConnectionToLocationDatabase()
 
+    # Extraire les livreurs les plus proches d'une localisation dans un rayon de 500 metres
+    def getObjects(self, userCoordinates):
 
+        locationDict = {"location" :
+                            {"$near": {
+                              "$geometry" : {
+                                  "type" : "Point",
+                                  "coordinates" : userCoordinates
+                              }  ,
+                                "$maxDistance" : 500
+                            }
+                             }
+                        }
 
+        collection1 = GenericLocationDAO.connectionToLocationDatabase.collection
 
+        foundObjects = list(collection1.find(locationDict, limit=10))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return foundObjects

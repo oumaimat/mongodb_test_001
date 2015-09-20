@@ -1,7 +1,7 @@
 __author__ = 'OTurki'
 
 from Model.User import  User
-from DAO.GenericDAO import GenericDAO
+from DAO.GenericDAO import GenericDAO, GenericLocationDAO
 
 #
 # def connectToDatabaseServer() :
@@ -46,6 +46,7 @@ from DAO.GenericDAO import GenericDAO
 
 
 genericDAO = GenericDAO()
+genericLocationDAO = GenericLocationDAO()
 
 collectionName = "users"
 
@@ -109,20 +110,10 @@ for user in usersList:
 #
 # print("\n userGetOneTest : \n", userGetOneTest)
 
-
-# Données test, à examiner plus tard
-# pref1 = {}
-# pref1["produit"]="yaourt glacé"
-# pref1["prix"] =  11.5
+# Tester la méthode getObjects
 #
-# pref2 = {}
-# pref2["produit"]="donut"
-# pref2["prix"] =  3.25
+# request_data_2 = []
 #
-# prefs = []
-# prefs.append(pref1)
-# prefs.append(pref2)
-
-
-
-
+# res = genericLocationDAO.getObjects(request_data_2)
+#
+# print(res)

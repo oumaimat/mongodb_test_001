@@ -1,7 +1,6 @@
 __author__ = 'OTurki'
 
-from Model.User import  User
-from DAO.GenericDAO import GenericDAO
+from DAO.GenericDAO import GenericDAO, GenericLocationDAO
 
 from flask import Flask, jsonify, request
 from bson.objectid import ObjectId
@@ -23,7 +22,7 @@ class MongoJsonEncoder(json.JSONEncoder):
 app = Flask(__name__)
 
 genericDAO = GenericDAO()
-
+genericLocationDAO = GenericLocationDAO()
 
 
 @app.route('/')
@@ -143,6 +142,21 @@ def update_user():
     res = json.dumps(result, cls=MongoJsonEncoder)
 
     return res
+
+# Chercher le livreur le plus proche de l'adresse de la course de l'utilisateur
+@app.route('/deliverus/get/steed', methods=['POST'])
+def get_nearest_steed():
+
+    request_data = request.json
+
+    request_data_2 = [request_data["lng"], request_data["lat"]]
+
+    nearestSteed = genericLocationDAO.getObjects(request_data_2)
+
+    res = json.dumps(nearestSteed, cls=MongoJsonEncoder)
+
+    return res
+
 
 # Main application
 if __name__ == '__main__':
